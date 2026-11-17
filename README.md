@@ -1,41 +1,47 @@
 # Morrow 챗봇
 
-Next.js App Router와 OpenAI API를 사용하는 한국어 스트리밍 챗봇입니다. Vercel에 바로 배포할 수 있습니다.
+KB 반려행복펫보험 약관을 찾아 답하는 RAG 챗봇입니다. Google 로그인 후 대화가 Supabase에 저장됩니다.
 
 ## 로컬 실행
 
 ```bash
 npm install
-cp .env.example .env.local
-```
-
-`.env.local`에 OpenAI API 키를 입력한 다음 실행합니다.
-
-```bash
+cp .env.example .env
 npm run dev
 ```
 
-`http://localhost:3000`에서 확인할 수 있습니다.
+`http://localhost:3000`에서 랜딩 페이지가 열립니다.
+
+## 처음 한 번만
+
+1. Supabase SQL Editor에서 `supabase/migrations/20261117150000_rag_chat.sql`을 실행합니다.
+2. `.env`에 `SUPABASE_SECRET_KEY`를 넣고 `npm run ingest`로 `dataset/kb.pdf`를 임베딩합니다.
+3. Authentication → Providers에서 Google을 켜고, Redirect URLs에 `http://localhost:3000/auth/callback`을 추가합니다.
 
 ## 환경 변수
 
-| 변수 | 필수 | 설명 |
+| 변수 | 노출 | 설명 |
 | --- | --- | --- |
-| `OPENAI_API_KEY` | 예 | OpenAI API 키. 브라우저에 노출되지 않습니다. |
-| `OPENAI_MODEL` | 아니요 | 사용할 모델. 기본값은 `gpt-4o-mini`입니다. |
+| `OPENAI_API_KEY` | 서버 | 답변 생성 |
+| `UPSTAGE_API_KEY` | 서버 | 문서·질문 임베딩 |
+| `NEXT_PUBLIC_SUPABASE_URL` | 브라우저 | Supabase 프로젝트 URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | 브라우저 | 공개 키 |
+| `SUPABASE_SECRET_KEY` | 서버 | 문서 임베딩 저장용 비밀 키 |
+
+비밀 키와 API 키는 `NEXT_PUBLIC_` 없이 두세요.
 
 ## Vercel 배포
 
-1. 이 저장소를 Vercel에 연결합니다.
-2. 프로젝트 **Settings → Environment Variables**에 `OPENAI_API_KEY`를 추가합니다. 필요하면 `OPENAI_MODEL`도 설정합니다.
-3. 배포합니다. 별도의 빌드 설정은 필요하지 않습니다.
+프로젝트 **Settings → Environment Variables**에 아래 값을 넣고 배포합니다.
 
-API 키는 `NEXT_PUBLIC_` 접두사 없이 설정해 주세요. 이 앱은 OpenAI API를 통해 답변을 생성하므로 OpenAI 사용량에 따라 비용이 발생할 수 있습니다.
+| 변수 | 값 |
+| --- | --- |
+| `OPENAI_API_KEY` | 사용 중인 OpenAI 키 |
+| `UPSTAGE_API_KEY` | 사용 중인 Upstage 키 |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://uhkhmpeddzkfbceuiuhz.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key |
+| `SUPABASE_SECRET_KEY` | Supabase secret key (임베딩 재실행 시에만 필요) |
 
-## 확인
+`OPENAI_MODEL`, `NEXT_PUBLIC_SITE_URL`은 선택입니다. 임베딩 데이터는 이미 Supabase에 있으므로 배포 후 `npm run ingest`를 다시 돌릴 필요는 없습니다.
 
-```bash
-npm run lint
-npm run typecheck
-npm run build
-```
+배포 도메인이 `http://localhost:3000`과 다르면 Supabase **Authentication → URL Configuration → Redirect URLs**에 `https://<배포-도메인>/auth/callback`을 추가해야 로그인이 동작합니다.

@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Morrow — AI 어시스턴트",
-  description: "무엇이든 편하게 물어보세요. Morrow가 함께 생각해 드릴게요.",
+  description: "KB 반려행복펫보험 약관을 바탕으로 보장과 청구 절차를 설명해 드려요.",
 };
 
 export default function RootLayout({
